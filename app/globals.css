@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+@theme {
+  /* Color Palette */
+  --color-bg-space: #06070a;
+  --color-text-primary: #f3f4f6;
+  --color-text-secondary: #9ca3af;
+  
+  /* Brand/Accent Colors */
+  --color-brand-purple: #7c3aed;
+  --color-brand-pink: #d946ef;
+  --color-cyber-blue: #06b6d4;
+  --color-cyber-purple: #a855f7;
+  
+  /* Signals */
+  --color-invest-green: #10b981;
+  --color-invest-dark: #065f46;
+  --color-invest-glow: rgba(16, 185, 129, 0.15);
+  
+  --color-pass-red: #f43f5e;
+  --color-pass-dark: #9f1239;
+  --color-pass-glow: rgba(244, 63, 94, 0.15);
+  
+  --color-warn-amber: #f59e0b;
+  --color-warn-dark: #78350f;
+  
+  /* Card Styling */
+  --color-glass-card: rgba(13, 17, 30, 0.45);
+  --color-glass-border: rgba(255, 255, 255, 0.06);
+  --color-glass-border-hover: rgba(255, 255, 255, 0.15);
+  
+  /* Fonts */
+  --font-outfit: var(--font-outfit);
+  --font-inter: var(--font-inter);
+  
+  /* Keyframe Animations */
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-spin-slow: spin 20s linear infinite;
+  --animate-float-slow: float 8s ease-in-out infinite;
+  --animate-radar: radar 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-12px) scale(1.02); }
+}
+
+@keyframes radar {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Base resets & global scrollbar style */
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background-color: #06070a;
+  color: #f3f4f6;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(6, 7, 10, 0.8);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 58, 237, 0.5);
+}
+
+/* Utilities for spicy glassmorphism & gradients */
+.glass-panel {
+  background: rgba(13, 17, 30, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1rem;
+}
+
+.glass-panel-hover:hover {
+  border-color: rgba(124, 58, 237, 0.35);
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.08);
+  transform: translateY(-2px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.text-glow-purple {
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+}
+
+.text-glow-emerald {
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+.text-glow-rose {
+  text-shadow: 0 0 10px rgba(244, 63, 94, 0.4);
+}
+
+/* Animated fluid gradient mesh backdrops */
+.bg-mesh-purple {
+  background-image: radial-gradient(at 0% 0%, rgba(124, 58, 237, 0.15) 0px, transparent 50%),
+                    radial-gradient(at 100% 100%, rgba(217, 70, 239, 0.15) 0px, transparent 50%);
+}
+
+.bg-mesh-emerald {
+  background-image: radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+                    radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.12) 0px, transparent 50%);
+}
+
+.bg-mesh-rose {
+  background-image: radial-gradient(at 0% 0%, rgba(244, 63, 94, 0.12) 0px, transparent 50%),
+                    radial-gradient(at 100% 100%, rgba(245, 158, 11) 0px, transparent 50%);
+}
