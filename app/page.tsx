@@ -443,10 +443,10 @@ export default function Home() {
 
               {/* 3️⃣ COMPLETED STATE (Vibrant Verdict Dashboard) */}
               {status === "completed" && selectedReport && (
-                <div className="max-w-5xl mx-auto space-y-8 pb-12 animate-fade-in">
+                <div className="max-w-5xl mx-auto space-y-8 pt-6 pb-12 animate-fade-in">
                   
                   {/* Verdict Top Card */}
-                  <div className="glass-panel p-8 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
+                  <div className="glass-panel p-8 mt-4 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
                     {/* Glowing Mesh Corner Indicator */}
                     <div className={`absolute top-0 right-0 h-40 w-40 rounded-full blur-[80px] opacity-25 pointer-events-none ${
                       selectedReport.verdict === "INVEST" ? "bg-invest-green" : "bg-pass-red"
@@ -461,15 +461,29 @@ export default function Home() {
                           {selectedReport.name}
                         </h2>
                       </div>
+                      
+                      {/* Compact Verdict Indicator right under the title */}
+                      <div className="flex items-center gap-3 bg-white/3 border border-white/5 px-3.5 py-1.5 rounded-xl w-fit">
+                        <span className={`font-outfit font-black text-sm uppercase tracking-wider ${
+                          selectedReport.verdict === "INVEST" ? "text-invest-green text-glow-emerald" : "text-pass-red text-glow-rose"
+                        }`}>
+                          {selectedReport.verdict}
+                        </span>
+                        <span className="h-3 w-px bg-white/15" />
+                        <span className="text-[11px] text-text-secondary font-medium font-mono">
+                          {selectedReport.confidenceScore}% Confidence Rating
+                        </span>
+                      </div>
+
                       <p className="text-sm text-text-secondary leading-relaxed max-w-2xl">
                         {selectedReport.summary}
                       </p>
                     </div>
 
-                    {/* Verdict Gauge Circle */}
+                    {/* Verdict Gauge Circle (Moved text slightly lower for visibility) */}
                     <div className="flex items-center gap-6 pr-4">
-                      <div className="text-right">
-                        <span className="block text-[10px] text-text-secondary uppercase tracking-widest font-mono mb-1">
+                      <div className="text-right space-y-1">
+                        <span className="block text-[10px] text-text-secondary uppercase tracking-widest font-mono">
                           Research Verdict
                         </span>
                         <span className={`block font-outfit font-black text-4xl uppercase tracking-wider ${
@@ -477,8 +491,8 @@ export default function Home() {
                         }`}>
                           {selectedReport.verdict}
                         </span>
-                        <span className="text-xs text-text-secondary">
-                          {selectedReport.confidenceScore}% confidence rating
+                        <span className="block text-[11px] text-text-secondary/70">
+                          {selectedReport.confidenceScore}% confidence
                         </span>
                       </div>
 
@@ -750,7 +764,7 @@ export default function Home() {
           )}
 
           {activeTab === "memos" && (
-            <div className="max-w-4xl mx-auto py-8">
+            <div className="max-w-4xl mx-auto pt-6 pb-12">
               <h2 className="font-outfit font-extrabold text-2xl text-white mb-2">Stored Investment Memos</h2>
               <p className="text-xs text-text-secondary mb-8">View historical research memos completed in this workspace.</p>
               
@@ -793,7 +807,7 @@ export default function Home() {
           )}
 
           {activeTab === "settings" && (
-            <div className="max-w-xl mx-auto py-8 space-y-6">
+            <div className="max-w-xl mx-auto pt-6 pb-12 space-y-6">
               <div>
                 <h2 className="font-outfit font-extrabold text-2xl text-white mb-2">Developer Settings</h2>
                 <p className="text-xs text-text-secondary">Configure backend model endpoints and API keys.</p>
@@ -823,7 +837,7 @@ export default function Home() {
           )}
 
           {activeTab === "docs" && (
-            <div className="max-w-2xl mx-auto py-8 space-y-6">
+            <div className="max-w-2xl mx-auto pt-6 pb-12 space-y-6">
               <div>
                 <h2 className="font-outfit font-extrabold text-2xl text-white mb-2">Research Agent Architecture</h2>
                 <p className="text-xs text-text-secondary">Documentation on the Multi-Agent state-machine under the hood.</p>
