@@ -182,5 +182,103 @@ export const mockReports: Record<string, InvestmentReport> = {
       { name: "Intel", pe: 38.0, peg: 3.5, margin: 2.1, debtToEquity: 0.78 },
       { name: "Broadcom (AVGO)", pe: 28.6, peg: 1.8, margin: 22.4, debtToEquity: 1.55 }
     ]
+  },
+  MSFT: {
+    ticker: "MSFT",
+    name: "Microsoft Corporation",
+    verdict: "INVEST",
+    confidenceScore: 90,
+    summary: "Microsoft's dominance in enterprise software and its early lead in cloud AI integration (Azure AI + OpenAI) make it an incredibly resilient growth engine. Strong cash generation and sticky corporate relationships justify its premium valuation.",
+    metrics: {
+      pe: 34.2,
+      peg: 2.4,
+      margin: 35.1,
+      debtToEquity: 1.10,
+      revenue: "$245.1B",
+      marketCap: "$3.18T",
+    },
+    swot: {
+      strengths: [
+        "Uncontested dominance in enterprise software (Office, Windows).",
+        "Strong cloud growth scaling (Azure AI infrastructure).",
+        "Strategic partnership with OpenAI providing immediate feature leads."
+      ],
+      weaknesses: [
+        "High reliance on external models (OpenAI API dependencies).",
+        "Integration debt from massive acquisitions (Activision Blizzard).",
+        "Slowing hardware growth (Surface and consumer PC lines)."
+      ],
+      opportunities: [
+        "Copilot subscription expansion across enterprise seats.",
+        "Generative AI cloud migration of government and health divisions.",
+        "Increased monetization of gaming cloud subscriptions."
+      ],
+      threats: [
+        "Systemic cybersecurity breaches damaging brand trust.",
+        "Regulatory antitrust scrutiny regarding bundles (Teams + Office).",
+        "Aggressive open-source AI models reducing SaaS software premiums."
+      ]
+    },
+    details: {
+      financials: "Microsoft's operating income grew 15% to $22B. Free cash flow stands at $70.6B annually, enabling continuous massive investments in server cap-ex ($14B per quarter) for AI scaling.",
+      sentiment: "Highly positive. Strong consensus Buy ratings across all major banks, with news focused on Azure cloud revenue growth outperforming AWS and Google Cloud.",
+      competitors: "Microsoft trades at a valuation premium (34x P/E) compared to Alphabet (22x P/E) but boasts higher software-margins and enterprise lock-in than AWS.",
+      risks: "Security vulnerabilities are the chief near-term risk. Federal audits and customer trust issues arising from foreign hack attacks pose recurring operational challenges."
+    },
+    competitorsList: [
+      { name: "Microsoft (MSFT)", pe: 34.2, peg: 2.4, margin: 35.1, debtToEquity: 1.10 },
+      { name: "Apple (AAPL)", pe: 29.4, peg: 2.1, margin: 26.3, debtToEquity: 1.45 },
+      { name: "Alphabet (GOOGL)", pe: 22.8, peg: 1.5, margin: 25.9, debtToEquity: 0.35 },
+      { name: "Amazon (AMZN)", pe: 41.5, peg: 1.9, margin: 8.5, debtToEquity: 0.72 }
+    ]
+  },
+  GOOGL: {
+    ticker: "GOOGL",
+    name: "Alphabet Inc.",
+    verdict: "INVEST",
+    confidenceScore: 82,
+    summary: "Alphabet maintains a massive moat in search advertising and video (YouTube). Despite temporary perception concerns around Gemini's launch and antitrust lawsuits, their low valuation multiple, cash pile, and DeepMind capability present an asymmetric buy opportunity.",
+    metrics: {
+      pe: 22.8,
+      peg: 1.5,
+      margin: 25.9,
+      debtToEquity: 0.35,
+      revenue: "$318.1B",
+      marketCap: "$2.15T",
+    },
+    swot: {
+      strengths: [
+        "Global search engine monopoly (90%+ market share).",
+        "Unrivaled video platform monetization (YouTube Ads & Premium).",
+        "Exceptional research capacity through Google DeepMind."
+      ],
+      weaknesses: [
+        "Vulnerability of traditional search advertising to AI chat disruption.",
+        "Slower developer adoption of enterprise Gemini tools compared to OpenAI.",
+        "DOJ antitrust litigation threatening forced product breakups."
+      ],
+      opportunities: [
+        "Waymo driverless robotaxi scaling and licensing programs.",
+        "Ad integration in conversational AI search results (SGE).",
+        "Google Cloud platform growth scaling into profitability."
+      ],
+      threats: [
+        "DOJ antitrust split-up mandates.",
+        "Search traffic leakage to custom platforms (ChatGPT, Perplexity).",
+        "Hardware cap-ex inflation due to building proprietary TPU infrastructure."
+      ]
+    },
+    details: {
+      financials: "Alphabet generated $61B in free cash flow, with a cash reserve of $108B, making it one of the most cash-rich firms in history. Operating margins remain steady at 26%.",
+      sentiment: "Mixed to cautious. Wall Street is positive on cloud scaling and core ad resilience, but tech social sentiment is concerned with antitrust legal rulings.",
+      competitors: "At 22.8x P/E, Google is the cheapest of the 'Magnificent Seven' tech stocks, trading at a steep discount to Microsoft and Apple despite matching revenue growth.",
+      risks: "Antitrust litigation is the chief concern. If the DOJ forces Alphabet to divest Android or Chrome, search distribution costs will spike, compressing margins."
+    },
+    competitorsList: [
+      { name: "Alphabet (GOOGL)", pe: 22.8, peg: 1.5, margin: 25.9, debtToEquity: 0.35 },
+      { name: "Microsoft (MSFT)", pe: 34.2, peg: 2.4, margin: 35.1, debtToEquity: 1.10 },
+      { name: "Meta (META)", pe: 26.4, peg: 1.6, margin: 32.1, debtToEquity: 0.12 },
+      { name: "Perplexity", pe: 99.0, peg: 5.5, margin: -20.0, debtToEquity: 0.10 }
+    ]
   }
 };
