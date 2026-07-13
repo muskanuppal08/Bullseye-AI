@@ -31,10 +31,22 @@ export default function Home() {
   const [logs, setLogs] = useState<string[]>([]);
   const [selectedReport, setSelectedReport] = useState<InvestmentReport | null>(null);
   
-  // Follow-up chat states
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState<{ sender: "user" | "agent"; text: string }[]>([]);
   const [isChatLoading, setIsChatLoading] = useState(false);
+
+  // API Key State
+  const [apiKeyInput, setApiKeyInput] = useState("");
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setApiKeyInput(localStorage.getItem("gemini_api_key") || "");
+    }
+  }, []);
+
+  const handleSaveApiKey = (val: string) => {
+    setApiKeyInput(val);
+    localStorage.setItem("gemini_api_key", val);
+  };
 
   const logsEndRef = useRef<HTMLDivElement>(null);
 
@@ -43,51 +55,93 @@ export default function Home() {
     logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [logs]);
 
-  // Simulate LangGraph Agent research execution
-  const handleStartAnalysis = (searchTicker: string) => {
+  // Stream LangGraph Agent research execution in real-time
+  const handleStartAnalysis = async (searchTicker: string) => {
     if (!searchTicker) return;
     const cleanTicker = searchTicker.toUpperCase().trim();
     setTicker(cleanTicker);
     setStatus("analyzing");
     setLogs([]);
     setActiveNode("start");
-    
-    // Simulate steps in the state graph
-    const steps = [
-      { node: "start", log: "🚀 [System] Initializing state graph with target: " + cleanTicker, delay: 0 },
-      { node: "finance", log: "📊 [Financial Analyst] Querying balance sheet, debt levels, and valuation multiples...", delay: 800 },
-      { node: "finance", log: "📊 [Financial Analyst] Calculated metrics: Debt-to-Equity, P/E ratio, operating margins.", delay: 1600 },
-      { node: "sentiment", log: "🔍 [Sentiment Inspector] Scraping news sources, Reddit investor discussions, and blogs...", delay: 2400 },
-      { node: "sentiment", log: "🔍 [Sentiment Inspector] Sentiment score synthesized. Key drivers: product demand, regulation.", delay: 3200 },
-      { node: "competitor", log: "⚔️ [Competitor Comparer] Benchmarking valuation ratios against industry median...", delay: 4000 },
-      { node: "risk", log: "⚠️ [Risk Assessor] Compiling SWOT matrix quadrants and regulatory risk weights...", delay: 4800 },
-      { node: "synthesizer", log: "🧠 [Verdict Synthesizer] Running final multi-dimensional investment reasoning...", delay: 5600 },
-      { node: "synthesizer", log: "✅ [System] Decision compiled. Report generation complete.", delay: 6400 }
-    ];
 
-    steps.forEach((step) => {
-      setTimeout(() => {
-        setActiveNode(step.node);
-        setLogs((prev) => [...prev, step.log]);
-        
-        // When finished
-        if (step.node === "synthesizer" && step.log.includes("complete")) {
-          setTimeout(() => {
-            // Load mock report if exists, otherwise generate dynamic one
-            const report = mockReports[cleanTicker] || generateFallbackReport(cleanTicker);
-            setSelectedReport(report);
-            setStatus("completed");
-            setActiveNode("idle");
-            setChatMessages([
-              { 
-                sender: "agent", 
-                text: `Hi! I've finalized my research on ${report.name} (${report.ticker}). I've issued a decision of **${report.verdict}** with **${report.confidenceScore}% confidence**. Ask me anything about their financials, risks, or competitors!` 
+    try {
+      const storedApiKey = localStorage.getItem("gemini_api_key") || "";
+
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ticker: cleanTicker,
+          apiKey: storedApiKey,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Server error: ${response.status}`);
+      }
+
+      if (!response.body) {
+        throw new Error("Response body is not readable.");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const packets = buffer.split("\n\n");
+        buffer = packets.pop() || "";
+
+        for (const packet of packets) {
+          const trimmed = packet.trim();
+          if (trimmed.startsWith("data: ")) {
+            try {
+              const data = JSON.parse(trimmed.substring(6));
+
+              if (data.error) {
+                setLogs((prev) => [...prev, `❌ [System Error] ${data.error}`]);
+                setStatus("idle");
+                setActiveNode("idle");
+                return;
               }
-            ]);
-          }, 800);
+
+              if (data.status === "start") {
+                setLogs((prev) => [...prev, data.log]);
+              } else if (data.status === "running") {
+                setActiveNode(data.node);
+                setLogs((prev) => [...prev, data.log]);
+              } else if (data.status === "completed" && data.report) {
+                const report: InvestmentReport = data.report;
+                setSelectedReport(report);
+                setStatus("completed");
+                setActiveNode("idle");
+                setChatMessages([
+                  {
+                    sender: "agent",
+                    text: `Hi! I've finalized my research on ${report.name} (${report.ticker}). I've issued a decision of **${report.verdict}** with **${report.confidenceScore}% confidence**. Ask me anything about their financials, risks, or competitors!`,
+                  },
+                ]);
+              }
+            } catch (e) {
+              // Ignore partial packet parse errors
+            }
+          }
         }
-      }, step.delay);
-    });
+      }
+    } catch (error: any) {
+      setLogs((prev) => [...prev, `❌ [System Error] Analysis failed: ${error.message}`]);
+      setTimeout(() => {
+        setStatus("idle");
+        setActiveNode("idle");
+      }, 4000);
+    }
   };
 
   const generateFallbackReport = (t: string): InvestmentReport => {
@@ -183,7 +237,7 @@ ${report.details.risks}
     URL.revokeObjectURL(url);
   };
 
-  const handleSendChat = (e: React.FormEvent) => {
+  const handleSendChat = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatInput.trim() || !selectedReport) return;
 
@@ -192,26 +246,37 @@ ${report.details.risks}
     setChatInput("");
     setIsChatLoading(true);
 
-    // Simulate Agent follow-up response
-    setTimeout(() => {
-      let responseText = `I ran a quick cross-examination of the research file for ${selectedReport.name}. Regarding "${userMsg}": `;
-      const query = userMsg.toLowerCase();
-      
-      if (query.includes("financial") || query.includes("debt") || query.includes("pe") || query.includes("balance")) {
-        responseText += `The financial data shows a leverage ratio of ${selectedReport.metrics.debtToEquity} and P/E ratio of ${selectedReport.metrics.pe}. ${selectedReport.details.financials}`;
-      } else if (query.includes("risk") || query.includes("weakness") || query.includes("threat") || query.includes("regulation")) {
-        responseText += `Our risk report highlights: ${selectedReport.swot.threats[0]} and ${selectedReport.swot.weaknesses[0]}. ${selectedReport.details.risks}`;
-      } else if (query.includes("sentiment") || query.includes("news") || query.includes("what people say")) {
-        responseText += `Current sentiment analysis notes: ${selectedReport.details.sentiment}`;
-      } else if (query.includes("competitor") || query.includes("better") || query.includes("comparison")) {
-        responseText += `Comparing with competitors: ${selectedReport.details.competitors}`;
-      } else {
-        responseText += `My core reasoning for the **${selectedReport.verdict}** decision is based on: ${selectedReport.summary} Let me know if you would like me to dissect their specific balance sheet ratios or customer sentiment logs further.`;
+    try {
+      const storedApiKey = localStorage.getItem("gemini_api_key") || "";
+
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ticker: selectedReport.ticker,
+          message: userMsg,
+          report: selectedReport,
+          apiKey: storedApiKey,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Server error: ${response.status}`);
       }
 
-      setChatMessages((prev) => [...prev, { sender: "agent", text: responseText }]);
+      const data = await response.json();
+      setChatMessages((prev) => [...prev, { sender: "agent", text: data.text }]);
+    } catch (error: any) {
+      setChatMessages((prev) => [
+        ...prev,
+        { sender: "agent", text: `⚠️ Chat Error: ${error.message || "Failed to contact agent."}` },
+      ]);
+    } finally {
       setIsChatLoading(false);
-    }, 1200);
+    }
   };
 
   return (
@@ -888,10 +953,11 @@ ${report.details.risks}
                   <input 
                     type="password" 
                     placeholder="AIzaSy..." 
-                    disabled 
-                    className="w-full bg-black/40 border border-glass-border rounded-xl px-4 py-2.5 text-xs text-text-secondary/60 outline-none"
+                    value={apiKeyInput}
+                    onChange={(e) => handleSaveApiKey(e.target.value)}
+                    className="w-full bg-black/40 border border-glass-border focus:border-brand-purple/40 rounded-xl px-4 py-2.5 text-xs text-white outline-none transition-colors"
                   />
-                  <span className="text-[10px] text-text-secondary/50 block">Keys are pulled from local .env.local file automatically.</span>
+                  <span className="text-[10px] text-text-secondary/50 block">Keys are stored locally in your browser and used securely for calculations.</span>
                 </div>
 
                 <div className="space-y-2">
